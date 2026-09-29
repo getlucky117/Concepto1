@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rumbo 29">
+<meta name="theme-color" content="#0A2F7A">
+<title>Rumbo 29</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230A2F7A'/><path d='M22 70 Q50 20 78 45' stroke='%23FFCB2B' stroke-width='10' fill='none' stroke-linecap='round'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#0A2F7A; --azul2:#1747B8; --cielo:#E7EEFC; --amarillo:#FFCB2B; --amarillo2:#FFF1C2;
+  --blanco:#fff; --fondo:#F3F6FC; --tinta:#0B1B3F; --gris:#5B6785; --linea:#D9E1F2;
+  --ok:#1B8A5A; --error:#C7362F;
+  --display:'Bricolage Grotesque', 'Figtree', system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:#DCE4F5;color:var(--tinta);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--amarillo);outline-offset:2px}
+
+.app{position:relative;max-width:430px;height:100%;margin:0 auto;background:var(--fondo);overflow:hidden}
+@media (min-width:520px){
+  body{display:flex;align-items:center;justify-content:center}
+  .app{width:400px;height:min(860px,96vh);border-radius:38px;box-shadow:0 30px 80px rgba(10,47,122,.28);border:8px solid #0B1B3F}
+}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.screen.active{display:flex;animation:entra .26s ease}
+.screen.sin-nav{padding-bottom:calc(28px + env(safe-area-inset-bottom,0px))}
+@keyframes entra{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1}
+.pad{padding:0 20px}
+.muted{color:var(--gris)}
+
+/* ---------- Login ---------- */
+#login{background:var(--azul);color:#fff;padding-bottom:0}
+.login-arte{position:relative;height:300px;flex-shrink:0;overflow:hidden}
+.login-arte svg{position:absolute;inset:0;width:100%;height:100%}
+.login-marca{position:absolute;left:24px;bottom:28px;right:24px}
+.logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:18px}
+.logo i{width:34px;height:34px;border-radius:10px;background:var(--amarillo);display:grid;place-items:center}
+.login-marca h1{font-size:44px;font-weight:800;margin-top:18px}
+.login-marca p{margin-top:8px;color:#C9D6F5;font-size:17px;max-width:30ch}
+.login-form{background:var(--fondo);color:var(--tinta);border-radius:28px 28px 0 0;padding:28px 22px calc(28px + env(safe-area-inset-bottom,0px));flex:1}
+.nota{font-size:13px;color:var(--gris);text-align:center;margin-top:14px}
+
+/* ---------- Formularios ---------- */
+.campo{display:block;margin-bottom:14px}
+.campo span{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+.campo input,.campo select{width:100%;height:52px;border-radius:14px;border:1.5px solid var(--linea);background:#fff;padding:0 14px;font-size:16px}
+.campo input:focus,.campo select:focus{border-color:var(--azul2);outline:none;box-shadow:0 0 0 3px var(--cielo)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:16px;font-weight:700;font-size:16px}
+.btn-amarillo{background:var(--amarillo);color:var(--azul)}
+.btn-azul{background:var(--azul);color:#fff}
+.btn-borde{border:1.5px solid var(--linea);background:#fff;color:var(--azul)}
+.btn:active{transform:scale(.98)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:999px;border:1.5px solid var(--linea);background:#fff;font-size:14px;font-weight:600;color:var(--gris)}
+.chip.on{background:var(--azul);border-color:var(--azul);color:#fff}
+.chips-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 20px 4px;scrollbar-width:none}
+.chips-scroll::-webkit-scrollbar{display:none}
+.chips-scroll .chip{white-space:nowrap}
+
+/* ---------- Encabezados ---------- */
+.hero{background:var(--azul);color:#fff;padding:calc(20px + env(safe-area-inset-top,0px)) 20px 26px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.hero .curva{position:absolute;right:-40px;top:-10px;width:220px;opacity:.9;pointer-events:none}
+.hero-top{display:flex;justify-content:space-between;align-items:center;position:relative}
+.campana{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.12);display:grid;place-items:center;position:relative}
+.campana b{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--amarillo)}
+.hero h1{font-size:30px;margin-top:22px;position:relative}
+.hero p{color:#C9D6F5;margin-top:6px;position:relative}
+.barra{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px;background:var(--fondo);position:sticky;top:0;z-index:5}
+.barra h2{font-size:20px}
+.atras{width:42px;height:42px;border-radius:14px;background:#fff;border:1.5px solid var(--linea);display:grid;place-items:center;flex-shrink:0}
+.titulo-tab{padding:calc(22px + env(safe-area-inset-top,0px)) 20px 14px}
+.titulo-tab h1{font-size:32px}
+.titulo-tab p{color:var(--gris);margin-top:4px}
+
+/* ---------- Inicio ---------- */
+.cuenta{margin:-18px 20px 0;background:var(--amarillo);color:var(--azul);border-radius:22px;padding:18px 20px;display:flex;align-items:center;gap:16px;position:relative;box-shadow:0 10px 24px rgba(10,47,122,.18)}
+.cuenta strong{font-family:var(--display);font-size:46px;font-weight:800;line-height:1}
+.cuenta span{font-size:15px;font-weight:600;line-height:1.3}
+.cifras{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 20px 0}
+.cifra{background:#fff;border-radius:16px;padding:14px 12px;border:1px solid var(--linea)}
+.cifra strong{display:block;font-family:var(--display);font-size:22px;color:var(--azul)}
+.cifra small{font-size:12.5px;color:var(--gris)}
+.seccion{margin:26px 20px 12px;display:flex;justify-content:space-between;align-items:baseline}
+.seccion h2{font-size:20px}
+.seccion button{color:var(--azul2);font-weight:700;font-size:14px}
+.acciones{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px}
+.accion{background:#fff;border:1px solid var(--linea);border-radius:20px;padding:16px;text-align:left;display:flex;flex-direction:column;gap:14px;min-height:118px}
+.accion .ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--cielo);color:var(--azul)}
+.accion b{font-size:15.5px;line-height:1.25}
+.accion.destacada{background:var(--azul);color:#fff;border-color:var(--azul)}
+.accion.destacada .ico{background:var(--amarillo)}
+.agenda{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.evento{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--linea);border-radius:18px;padding:12px}
+.fecha{width:54px;height:58px;border-radius:14px;background:var(--cielo);color:var(--azul);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.fecha b{font-family:var(--display);font-size:22px;line-height:1}
+.fecha small{font-size:12px;font-weight:600}
+.evento h3{font-family:'Figtree',sans-serif;font-size:15.5px;letter-spacing:0;font-weight:700}
+.evento p{font-size:13.5px;color:var(--gris);margin-top:2px}
+
+/* ---------- Voluntarios ---------- */
+.total-vol{margin:0 20px;background:var(--azul);color:#fff;border-radius:22px;padding:20px;display:flex;justify-content:space-between;align-items:flex-end}
+.total-vol strong{font-family:var(--display);font-size:42px;font-weight:800;line-height:1;display:block}
+.total-vol small{color:#C9D6F5}
+.total-vol button{background:var(--amarillo);color:var(--azul);font-weight:700;padding:12px 16px;border-radius:14px;font-size:14.5px}
+.buscar{margin:16px 20px 12px;position:relative}
+.buscar input{width:100%;height:50px;border-radius:14px;border:1.5px solid var(--linea);background:#fff;padding:0 14px 0 44px;font-size:16px}
+.buscar svg{position:absolute;left:14px;top:15px;color:var(--gris)}
+.lista{padding:12px 20px 0;display:flex;flex-direction:column;gap:8px}
+.persona{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea);border-radius:16px;padding:12px}
+.avatar{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:700;background:var(--cielo);color:var(--azul);flex-shrink:0}
+.persona .info{flex:1;min-width:0}
+.persona b{display:block;font-size:15.5px}
+.persona small{color:var(--gris);font-size:13.5px}
+.rol{font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;background:var(--amarillo2);color:#7A5600;white-space:nowrap}
+.vacio{text-align:center;padding:30px 20px;color:var(--gris)}
+
+/* ---------- Mapa ---------- */
+.mapa-caja{margin:0 12px;background:#fff;border:1px solid var(--linea);border-radius:24px;padding:10px 8px 14px}
+.mapa-caja svg{width:100%;height:auto;display:block}
+.provincia{cursor:pointer;transition:opacity .15s}
+.provincia rect{transition:stroke-width .15s}
+.leyenda{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gris);padding:4px 12px 0}
+.leyenda i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#DCE6FA,#0A2F7A)}
+.detalle-prov{margin:14px 20px 0;background:var(--azul);color:#fff;border-radius:22px;padding:18px 20px}
+.detalle-prov h3{font-size:22px}
+.detalle-prov .fila{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px}
+.detalle-prov strong{font-family:var(--display);font-size:38px;line-height:1}
+.detalle-prov small{color:#C9D6F5}
+.progreso{height:10px;border-radius:5px;background:rgba(255,255,255,.18);margin-top:14px;overflow:hidden}
+.progreso i{display:block;height:100%;background:var(--amarillo);border-radius:5px;transition:width .4s}
+.ranking{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.rank{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:14.5px}
+.rank .barra-r{grid-column:1/3;height:6px;border-radius:3px;background:var(--linea);overflow:hidden}
+.rank .barra-r i{display:block;height:100%;background:var(--azul2)}
+
+/* ---------- Propuestas ---------- */
+.propuestas{padding:12px 20px 0;display:flex;flex-direction:column;gap:12px}
+.prop{background:#fff;border:1px solid var(--linea);border-radius:22px;padding:18px;text-align:left;width:100%;display:flex;gap:14px;align-items:flex-start}
+.prop .ico{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;flex-shrink:0;font-size:24px}
+.prop h3{font-size:18px}
+.prop p{color:var(--gris);font-size:14.5px;margin-top:4px;line-height:1.4}
+.prop .apoyos{font-size:13px;font-weight:700;color:var(--azul2);margin-top:8px}
+.prop-hero{margin:0 20px;border-radius:26px;padding:26px 22px;color:#fff;background:var(--azul);position:relative;overflow:hidden}
+.prop-hero .tema{display:inline-block;background:var(--amarillo);color:var(--azul);font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px}
+.prop-hero h1{font-size:30px;margin-top:14px}
+.prop-hero p{color:#C9D6F5;margin-top:10px;line-height:1.45}
+.puntos{padding:0 20px;display:flex;flex-direction:column;gap:10px;counter-reset:p}
+.punto{display:flex;gap:12px;background:#fff;border:1px solid var(--linea);border-radius:16px;padding:14px;line-height:1.4;font-size:15px}
+.punto::before{counter-increment:p;content:counter(p);width:28px;height:28px;border-radius:9px;background:var(--cielo);color:var(--azul);font-weight:700;display:grid;place-items:center;flex-shrink:0;font-size:14px}
+.botones{padding:20px 20px 0;display:flex;flex-direction:column;gap:10px}
+
+/* ---------- Testigo / Acta ---------- */
+.mesa{margin:0 20px;background:var(--azul);color:#fff;border-radius:24px;padding:20px;position:relative;overflow:hidden}
+.mesa small{color:#C9D6F5}
+.mesa .num{font-family:var(--display);font-size:56px;font-weight:800;line-height:1;color:var(--amarillo);margin:6px 0 10px}
+.mesa h3{font-size:19px}
+.mesa p{color:#C9D6F5;font-size:14.5px;margin-top:4px}
+.estado{display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:rgba(255,255,255,.12);padding:8px 12px;border-radius:12px;font-size:14px;font-weight:600}
+.estado i{width:9px;height:9px;border-radius:50%;background:var(--amarillo)}
+.estado.ok i{background:#4ADE9A}
+.pasos{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.paso{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--linea);border-radius:16px;padding:14px;text-align:left;width:100%;font-size:15.5px;font-weight:600}
+.paso .check{width:28px;height:28px;border-radius:9px;border:2px solid var(--linea);display:grid;place-items:center;flex-shrink:0;color:transparent}
+.paso.hecho .check{background:var(--ok);border-color:var(--ok);color:#fff}
+.paso.hecho span{color:var(--gris);text-decoration:line-through}
+.foto{margin:0 20px;border:2px dashed #B7C5E6;border-radius:22px;background:#fff;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--azul);font-weight:700;position:relative;overflow:hidden;cursor:pointer}
+.foto input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.foto small{color:var(--gris);font-weight:500}
+.votos{padding:0 20px;display:flex;flex-direction:column;gap:8px}
+.voto{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--linea);border-radius:16px;padding:10px 10px 10px 14px}
+.voto label{font-weight:600;font-size:15px}
+.voto input{width:96px;height:44px;border-radius:12px;border:1.5px solid var(--linea);text-align:center;font-size:18px;font-weight:700;font-family:var(--display)}
+.voto input:focus{outline:none;border-color:var(--azul2);box-shadow:0 0 0 3px var(--cielo)}
+.voto.total{background:var(--cielo);border-color:transparent}
+.cuadre{margin:12px 20px 0;padding:14px;border-radius:16px;font-size:14.5px;font-weight:600;display:flex;gap:10px;align-items:center}
+.cuadre.bien{background:#E3F5EC;color:var(--ok)}
+.cuadre.mal{background:#FBE7E5;color:var(--error)}
+
+/* ---------- Perfil ---------- */
+.perfil-top{padding:calc(28px + env(safe-area-inset-top,0px)) 20px 20px;text-align:center}
+.perfil-top .avatar{width:88px;height:88px;border-radius:28px;font-size:30px;margin:0 auto;background:var(--azul);color:var(--amarillo);font-family:var(--display)}
+.perfil-top h1{font-size:26px;margin-top:14px}
+.perfil-top p{color:var(--gris);margin-top:4px}
+.opciones{margin:0 20px;background:#fff;border:1px solid var(--linea);border-radius:20px;overflow:hidden}
+.opcion{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--linea);width:100%;text-align:left;font-size:15.5px;font-weight:600}
+.opcion:last-child{border-bottom:0}
+.opcion.salir{color:var(--error)}
+.switch{width:48px;height:28px;border-radius:14px;background:var(--linea);position:relative;transition:background .2s;flex-shrink:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--azul2)}
+.switch.on::after{transform:translateX(20px)}
+
+/* ---------- Barra de navegación ---------- */
+.tabbar{position:absolute;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));height:68px;background:var(--azul);border-radius:24px;display:grid;grid-template-columns:repeat(5,1fr);padding:0 6px;z-index:20;box-shadow:0 12px 30px rgba(10,47,122,.35)}
+.tabbar[hidden]{display:none}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#8FA6DA;font-size:11.5px;font-weight:600}
+.tab .burbuja{width:44px;height:30px;border-radius:12px;display:grid;place-items:center;transition:background .2s}
+.tab.on{color:#fff}
+.tab.on .burbuja{background:var(--amarillo);color:var(--azul)}
+
+.toast{position:absolute;left:20px;right:20px;top:calc(16px + env(safe-area-inset-top,0px));background:var(--tinta);color:#fff;padding:14px 16px;border-radius:16px;font-weight:600;font-size:15px;z-index:50;transform:translateY(-140%);transition:transform .3s;display:flex;gap:10px;align-items:center}
+.toast.ver{transform:none}
+.toast i{width:10px;height:10px;border-radius:50%;background:var(--amarillo);flex-shrink:0}
+.espacio{height:8px}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- 1. LOGIN -->
+  <section class="screen active sin-nav" id="login">
+    <div class="login-arte">
+      <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path d="M-20 210 C 60 150, 120 230, 190 170 S 300 60, 420 110" stroke="#FFCB2B" stroke-width="26" fill="none" stroke-linecap="round"/>
+        <path d="M-20 250 C 60 190, 120 270, 190 210 S 300 100, 420 150" stroke="#1747B8" stroke-width="10" fill="none" stroke-linecap="round" opacity=".8"/>
+        <circle cx="330" cy="60" r="5" fill="#fff"/><circle cx="352" cy="82" r="3" fill="#fff" opacity=".6"/>
+      </svg>
+      <div class="login-marca">
+        <span class="logo"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A2F7A" stroke-width="3" stroke-linecap="round"><path d="M4 17 Q12 3 20 10"/></svg></i>Rumbo 29</span>
+        <h1>Panamá se organiza desde aquí</h1>
+        <p>Voluntarios, propuestas y la defensa del voto en una sola app.</p>
+      </div>
+    </div>
+    <form class="login-form" id="form-login">
+      <label class="campo"><span>Cédula</span><input inputmode="text" placeholder="8-123-4567" autocomplete="off"></label>
+      <label class="campo"><span>Contraseña</span><input type="password" placeholder="Tu contraseña"></label>
+      <button class="btn btn-azul" type="submit">Entrar</button>
+      <p class="nota">Versión de demostración: cualquier dato te deja entrar.</p>
+    </form>
+  </section>
+
+  <!-- 2. INICIO -->
+  <section class="screen" id="inicio">
+    <header class="hero">
+      <svg class="curva" viewBox="0 0 200 120" aria-hidden="true"><path d="M0 100 C 50 60, 90 110, 130 60 S 180 20, 210 30" stroke="#1747B8" stroke-width="18" fill="none" stroke-linecap="round"/></svg>
+      <div class="hero-top">
+        <span class="logo"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A2F7A" stroke-width="3" stroke-linecap="round"><path d="M4 17 Q12 3 20 10"/></svg></i>Rumbo 29</span>
+        <button class="campana" aria-label="Notificaciones" data-toast="Tienes una capacitación de testigos este sábado"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg><b></b></button>
+      </div>
+      <h1>Hola, Ana</h1>
+      <p>Esto es lo que está pasando en el movimiento.</p>
+    </header>
+    <div class="cuenta"><strong id="dias">0</strong><span>días para las elecciones del 6 de mayo de 2029</span></div>
+    <div class="cifras">
+      <div class="cifra"><strong id="c-vol">0</strong><small>voluntarios</small></div>
+      <div class="cifra"><strong>13</strong><small>provincias y comarcas</small></div>
+      <div class="cifra"><strong>6</strong><small>propuestas</small></div>
+    </div>
+    <div class="seccion"><h2>¿Qué quieres hacer?</h2></div>
+    <div class="acciones">
+      <button class="accion destacada" data-ir="testigo"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A2F7A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></span><b>Mi mesa de testigo</b></button>
+      <button class="accion" data-ir="registro"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M19 8v6M16 11h6"/></svg></span><b>Registrar voluntario</b></button>
+      <button class="accion" data-ir="mapa"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span><b>Ver mapa de voluntarios</b></button>
+      <button class="accion" data-ir="propuestas"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3a6 6 0 0 0-3 11.2V17h6v-2.8A6 6 0 0 0 12 3z"/><path d="M9 21h6"/></svg></span><b>Conocer las propuestas</b></button>
+    </div>
+    <div class="seccion"><h2>Próximas actividades</h2></div>
+    <div class="agenda">
+      <div class="evento"><div class="fecha"><b>03</b><small>oct</small></div><div><h3>Capacitación de testigos de mesa</h3><p>Casa comunal de Arraiján, 9:00 a. m.</p></div></div>
+      <div class="evento"><div class="fecha"><b>11</b><small>oct</small></div><div><h3>Recorrido casa por casa</h3><p>Corregimiento de Pedregal, 8:00 a. m.</p></div></div>
+      <div class="evento"><div class="fecha"><b>18</b><small>oct</small></div><div><h3>Foro de propuestas: agua potable</h3><p>Santiago de Veraguas, 6:00 p. m.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 3. VOLUNTARIOS -->
+  <section class="screen" id="voluntarios">
+    <div class="titulo-tab"><h1>Voluntarios</h1><p>La red que sostiene el movimiento.</p></div>
+    <div class="total-vol">
+      <div><strong id="v-total">0</strong><small>registrados en todo el país</small></div>
+      <button data-ir="registro">Registrar</button>
+    </div>
+    <div class="buscar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="buscar" type="search" placeholder="Buscar por nombre o provincia">
+    </div>
+    <div class="chips-scroll" id="filtros"></div>
+    <div class="seccion" style="margin-top:18px"><h2>Registrados recientemente</h2></div>
+    <div class="lista" id="lista-vol" style="padding-top:0"></div>
+  </section>
+
+  <!-- 4. REGISTRO -->
+  <section class="screen sin-nav" id="registro">
+    <div class="barra"><button class="atras" data-atras aria-label="Volver"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><h2>Nuevo voluntario</h2></div>
+    <form class="pad" id="form-vol" style="padding-top:8px">
+      <label class="campo"><span>Nombre completo</span><input id="r-nombre" placeholder="Ej. Luis Pérez" autocomplete="off"></label>
+      <label class="campo"><span>Cédula</span><input id="r-cedula" placeholder="8-000-0000" autocomplete="off"></label>
+      <label class="campo"><span>Teléfono (WhatsApp)</span><input id="r-tel" type="tel" inputmode="tel" placeholder="6000-0000"></label>
+      <label class="campo"><span>Provincia o comarca</span><select id="r-prov"></select></label>
+      <label class="campo"><span>Corregimiento</span><input id="r-corr" placeholder="Ej. Juan Díaz"></label>
+      <div class="campo"><span>¿Cómo quieres ayudar?</span>
+        <div class="chips" id="r-roles">
+          <button type="button" class="chip on">Testigo de mesa</button>
+          <button type="button" class="chip">Casa por casa</button>
+          <button type="button" class="chip">Redes sociales</button>
+          <button type="button" class="chip">Logística</button>
+          <button type="button" class="chip">Transporte</button>
+        </div>
+      </div>
+      <div class="espacio"></div>
+      <button class="btn btn-amarillo" type="submit">Registrar voluntario</button>
+    </form>
+  </section>
+
+  <!-- 5. MAPA -->
+  <section class="screen" id="mapa">
+    <div class="titulo-tab"><h1>Mapa de voluntarios</h1><p>Toca una provincia para ver su avance.</p></div>
+    <div class="mapa-caja">
+      <svg id="svg-mapa" viewBox="0 0 420 215" role="img" aria-label="Mapa esquemático de Panamá por provincia"></svg>
+      <div class="leyenda"><span>Menos</span><i></i><span>Más voluntarios</span></div>
+    </div>
+    <div class="detalle-prov" id="detalle-prov"></div>
+    <div class="seccion"><h2>Ranking por provincia</h2></div>
+    <div class="ranking" id="ranking"></div>
+  </section>
+
+  <!-- 6. PROPUESTAS -->
+  <section class="screen" id="propuestas">
+    <div class="titulo-tab"><h1>Propuestas</h1><p>Lo que vamos a hacer, explicado claro.</p></div>
+    <div class="propuestas" id="lista-prop"></div>
+  </section>
+
+  <!-- 7. DETALLE PROPUESTA -->
+  <section class="screen sin-nav" id="propuesta">
+    <div class="barra"><button class="atras" data-atras aria-label="Volver"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><h2>Propuesta</h2></div>
+    <div id="prop-detalle"></div>
+  </section>
+
+  <!-- 8. TESTIGO -->
+  <section class="screen sin-nav" id="testigo">
+    <div class="barra"><button class="atras" data-atras aria-label="Volver"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><h2>Mi mesa</h2></div>
+    <div class="mesa">
+      <small>Mesa asignada</small>
+      <div class="num">1427</div>
+      <h3>Escuela Primaria Los Andes N.º 2</h3>
+      <p>San Miguelito, circuito 8-6</p>
+      <div class="estado" id="estado-acta"><i></i><span>Acta pendiente</span></div>
+    </div>
+    <div class="seccion"><h2>Día de la elección</h2></div>
+    <div class="pasos" id="pasos"></div>
+    <div class="botones">
+      <button class="btn btn-amarillo" data-ir="acta">Capturar acta de la mesa</button>
+      <button class="btn btn-borde" data-toast="Incidencia enviada a tu coordinador">Reportar una incidencia</button>
+    </div>
+  </section>
+
+  <!-- 9. ACTA -->
+  <section class="screen sin-nav" id="acta">
+    <div class="barra"><button class="atras" data-atras aria-label="Volver"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><h2>Acta, mesa 1427</h2></div>
+    <label class="foto" id="foto">
+      <input type="file" accept="image/*" capture="environment" id="foto-input" aria-label="Tomar foto del acta">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      <span>Tomar foto del acta</span>
+      <small>Que se vean todas las firmas</small>
+    </label>
+    <div class="seccion"><h2>Votos por candidatura</h2></div>
+    <div class="votos" id="votos"></div>
+    <div class="cuadre mal" id="cuadre"></div>
+    <div class="botones"><button class="btn btn-azul" id="enviar-acta">Enviar acta</button></div>
+  </section>
+
+  <!-- 10. PERFIL -->
+  <section class="screen" id="perfil">
+    <div class="perfil-top">
+      <div class="avatar">AC</div>
+      <h1>Ana Castillo</h1>
+      <p>Coordinadora de voluntarios en Panamá Oeste</p>
+    </div>
+    <div class="cifras" style="margin-top:0">
+      <div class="cifra"><strong>48</strong><small>personas sumadas</small></div>
+      <div class="cifra"><strong>12</strong><small>actividades</small></div>
+      <div class="cifra"><strong>1427</strong><small>mesa asignada</small></div>
+    </div>
+    <div class="seccion"><h2>Ajustes</h2></div>
+    <div class="opciones">
+      <button class="opcion" data-switch>Recibir avisos de actividades <span class="switch on"></span></button>
+      <button class="opcion" data-switch>Usar datos solo con wifi <span class="switch"></span></button>
+      <button class="opcion" data-toast="Rumbo 29, prototipo sin backend">Acerca de la app <span class="muted">v0.1</span></button>
+      <button class="opcion salir" id="salir">Cerrar sesión</button>
+    </div>
+  </section>
+
+  <!-- NAVEGACIÓN -->
+  <nav class="tabbar" id="tabbar" hidden>
+    <button class="tab" data-ir="inicio"><span class="burbuja"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>Inicio</button>
+    <button class="tab" data-ir="propuestas"><span class="burbuja"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3a6 6 0 0 0-3 11.2V17h6v-2.8A6 6 0 0 0 12 3z"/><path d="M9 21h6"/></svg></span>Propuestas</button>
+    <button class="tab" data-ir="voluntarios"><span class="burbuja"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/></svg></span>Voluntarios</button>
+    <button class="tab" data-ir="mapa"><span class="burbuja"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg></span>Mapa</button>
+    <button class="tab" data-ir="perfil"><span class="burbuja"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>Perfil</button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><i></i><span></span></div>
+</div>
+
+<script>
+/* ================= Datos de ejemplo (sin backend) ================= */
+const provincias = [
+  {id:'bocas',     n:'Bocas del Toro',          c:'Bocas',       v:212,  x:8,   y:44,  w:62,  h:40},
+  {id:'chiriqui',  n:'Chiriquí',                c:'Chiriquí',    v:1480, x:8,   y:90,  w:62,  h:48},
+  {id:'ngabe',     n:'Comarca Ngäbe-Buglé',     c:'Ngäbe B.',    v:190,  x:76,  y:52,  w:60,  h:52},
+  {id:'veraguas',  n:'Veraguas',                c:'Veraguas',    v:640,  x:142, y:70,  w:50,  h:82},
+  {id:'cocle',     n:'Coclé',                   c:'Coclé',       v:710,  x:198, y:78,  w:52,  h:40},
+  {id:'herrera',   n:'Herrera',                 c:'Herrera',     v:430,  x:198, y:124, w:46,  h:30},
+  {id:'lossantos', n:'Los Santos',              c:'Los Santos',  v:380,  x:206, y:160, w:58,  h:34},
+  {id:'colon',     n:'Colón',                   c:'Colón',       v:920,  x:176, y:22,  w:86,  h:40},
+  {id:'poeste',    n:'Panamá Oeste',            c:'P. Oeste',    v:2310, x:256, y:70,  w:50,  h:44},
+  {id:'panama',    n:'Panamá',                  c:'Panamá',      v:4870, x:312, y:58,  w:52,  h:46},
+  {id:'gunayala',  n:'Comarca Guna Yala',       c:'Guna Yala',   v:95,   x:268, y:14,  w:140, h:34},
+  {id:'embera',    n:'Comarca Emberá-Wounaan',  c:'Emberá',      v:48,   x:318, y:110, w:48,  h:32},
+  {id:'darien',    n:'Darién',                  c:'Darién',      v:160,  x:370, y:58,  w:44,  h:88},
+];
+let voluntarios = [
+  {n:'María Rodríguez', p:'panama', r:'Testigo de mesa'},
+  {n:'José Luis Batista', p:'chiriqui', r:'Casa por casa'},
+  {n:'Yaritza Castillo', p:'poeste', r:'Redes sociales'},
+  {n:'Carlos Sánchez', p:'colon', r:'Testigo de mesa'},
+  {n:'Ana Gabriela Pinto', p:'veraguas', r:'Logística'},
+  {n:'Rubén Quintero', p:'cocle', r:'Transporte'},
+  {n:'Itzel Morales', p:'herrera', r:'Testigo de mesa'},
+  {n:'Kevin Abrego', p:'panama', r:'Redes sociales'},
+  {n:'Diomedes Jiménez', p:'lossantos', r:'Casa por casa'},
+  {n:'Nairobi Smith', p:'bocas', r:'Testigo de mesa'},
+  {n:'Aurelio Mendoza', p:'darien', r:'Logística'},
+  {n:'Lineth Samudio', p:'poeste', r:'Testigo de mesa'},
+];
+const propuestas = [
+  {id:'agua', e:'💧', bg:'#E3EEFF', t:'Agua potable todos los días', tema:'Agua', r:'Ningún barrio debería depender de carros cisterna. Planta, tuberías y mantenimiento con metas públicas.', a:3120,
+   p:['Terminar y ampliar las plantas potabilizadoras que hoy están a medias.','Cambiar las tuberías con más fugas, empezando por los barrios con más cortes.','Publicar cada mes cuántas horas de agua recibe cada corregimiento.']},
+  {id:'salud', e:'🩺', bg:'#FFF1C2', t:'Medicinas que sí llegan', tema:'Salud', r:'Compras transparentes y abastecimiento real en policlínicas y centros de salud.', a:2740,
+   p:['Un sistema en línea que muestre el inventario de medicinas de cada centro.','Compras conjuntas con reglas abiertas para bajar precios.','Citas por teléfono y WhatsApp para evitar filas desde la madrugada.']},
+  {id:'educacion', e:'📚', bg:'#E6F6EE', t:'Escuelas dignas', tema:'Educación', r:'Aulas reparadas, internet en cada escuela y docentes mejor formados.', a:2210,
+   p:['Plan de reparación de escuelas rancho con fechas y montos visibles.','Internet en todas las escuelas públicas del país.','Formación continua y evaluación justa para docentes.']},
+  {id:'transporte', e:'🚌', bg:'#EDE9FF', t:'Moverse sin perder el día', tema:'Transporte', r:'Rutas de buses integradas al metro y carriles exclusivos en los corredores más lentos.', a:1980,
+   p:['Carriles exclusivos para buses en los corredores con más tranque.','Una sola tarjeta para metro, metrobús y rutas del interior.','Horarios y ubicación de buses en tiempo real.']},
+  {id:'empleo', e:'💼', bg:'#FFE8DD', t:'Empleo para jóvenes', tema:'Empleo', r:'Primer empleo, pasantías pagadas y apoyo a pequeños negocios.', a:1650,
+   p:['Pasantías pagadas en empresas que reciban incentivos fiscales.','Créditos pequeños y rápidos para emprendedores.','Capacitación técnica ligada a los empleos que existen hoy.']},
+  {id:'transparencia', e:'🔎', bg:'#E7EEFC', t:'Cuentas claras', tema:'Transparencia', r:'Cada balboa del Estado visible en línea, con contratos y avances de obra.', a:2890,
+   p:['Portal con todos los contratos públicos y su estado de avance.','Declaraciones de bienes de funcionarios en formato abierto.','Protección real a quien denuncie corrupción.']},
+];
+const candidaturas = ['Rumbo 29','Alianza Norte','Partido Horizonte','Libre postulación'];
+const pasos = ['Llegué al centro de votación','La mesa se instaló','Abrió la votación','Cerró la votación','Terminó el escrutinio'];
+let pasosHechos = [true,true,false,false,false];
+let provSel = 'panama';
+let propActual = 'agua';
+let apoyadas = new Set();
+let filtro = 'todas';
+let estadoActa = 'pendiente';
+let sesion = false;
+
+/* ================= Utilidades ================= */
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString('es-PA');
+const total = () => provincias.reduce((s,p)=>s+p.v,0);
+const provPor = id => provincias.find(p=>p.id===id);
+const iniciales = n => n.split(' ').slice(0,2).map(w=>w[0]).join('');
+let tToast;
+function toast(msg){
+  const t=$('#toast'); t.querySelector('span').textContent=msg; t.classList.add('ver');
+  clearTimeout(tToast); tToast=setTimeout(()=>t.classList.remove('ver'),2600);
+}
+
+/* ================= Navegación ================= */
+const tabs = ['inicio','propuestas','voluntarios','mapa','perfil'];
+const render = {};
+function mostrar(id){
+  if(!document.getElementById(id)) id='inicio';
+  if(!sesion) id='login';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id));
+  $('#tabbar').hidden = !tabs.includes(id);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.ir===id));
+  document.getElementById(id).scrollTop = 0;
+  if(render[id]) render[id]();
+}
+function ir(id){ if(location.hash==='#'+id) mostrar(id); else location.hash=id; }
+window.addEventListener('hashchange',()=>mostrar(location.hash.slice(1)||'inicio'));
+
+document.addEventListener('click', e=>{
+  const irA = e.target.closest('[data-ir]');
+  if(irA){ e.preventDefault(); ir(irA.dataset.ir); return; }
+  if(e.target.closest('[data-atras]')){ history.length>1 ? history.back() : ir('inicio'); return; }
+  const tt = e.target.closest('[data-toast]');
+  if(tt){ toast(tt.dataset.toast); return; }
+  const sw = e.target.closest('[data-switch]');
+  if(sw){ sw.querySelector('.switch').classList.toggle('on'); }
+});
+
+/* ================= 1. Login ================= */
+$('#form-login').addEventListener('submit', e=>{ e.preventDefault(); sesion=true; ir('inicio'); });
+$('#salir').addEventListener('click', ()=>{ sesion=false; ir('login'); });
+
+/* ================= 2. Inicio ================= */
+render.inicio = ()=>{
+  const dias = Math.max(0, Math.ceil((new Date(2029,4,6) - new Date())/86400000));
+  $('#dias').textContent = fmt(dias);
+  $('#c-vol').textContent = fmt(total());
+};
+
+/* ================= 3. Voluntarios ================= */
+function pintarFiltros(){
+  const opciones = [{id:'todas',c:'Todas'}, ...provincias];
+  $('#filtros').innerHTML = opciones.map(p=>`<button class="chip ${filtro===p.id?'on':''}" data-f="${p.id}">${p.c}</button>`).join('');
+}
+$('#filtros').addEventListener('click', e=>{
+  const b=e.target.closest('[data-f]'); if(!b) return;
+  filtro=b.dataset.f; pintarFiltros(); pintarLista();
+});
+function pintarLista(){
+  const q = $('#buscar').value.trim().toLowerCase();
+  const res = voluntarios.filter(v=>{
+    const prov = provPor(v.p).n.toLowerCase();
+    return (filtro==='todas'||v.p===filtro) && (!q || v.n.toLowerCase().includes(q) || prov.includes(q));
+  });
+  $('#lista-vol').innerHTML = res.length ? res.map(v=>`
+    <div class="persona"><div class="avatar">${iniciales(v.n)}</div>
+      <div class="info"><b>${v.n}</b><small>${provPor(v.p).n}</small></div>
+      <span class="rol">${v.r}</span></div>`).join('')
+    : `<div class="vacio">Nadie coincide con esa búsqueda. Prueba con otro nombre o provincia.</div>`;
+}
+$('#buscar').addEventListener('input', pintarLista);
+render.voluntarios = ()=>{ $('#v-total').textContent = fmt(total()); pintarFiltros(); pintarLista(); };
+
+/* ================= 4. Registro ================= */
+$('#r-prov').innerHTML = '<option value="">Elige una opción</option>' + provincias.map(p=>`<option value="${p.id}">${p.n}</option>`).join('');
+$('#r-roles').addEventListener('click', e=>{
+  const c=e.target.closest('.chip'); if(!c) return;
+  $('#r-roles').querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
+});
+$('#form-vol').addEventListener('submit', e=>{
+  e.preventDefault();
+  const n=$('#r-nombre').value.trim(), p=$('#r-prov').value;
+  if(!n){ toast('Escribe el nombre del voluntario'); return; }
+  if(!p){ toast('Elige la provincia o comarca'); return; }
+  const r=$('#r-roles .chip.on').textContent;
+  voluntarios.unshift({n,p,r}); provPor(p).v++;
+  e.target.reset(); $('#r-roles').querySelectorAll('.chip').forEach((x,i)=>x.classList.toggle('on',i===0));
+  filtro='todas'; toast(`${n} quedó registrado como voluntario`);
+  ir('voluntarios');
+});
+
+/* ================= 5. Mapa ================= */
+function mezclar(a,b,t){
+  const h=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));
+  const [A,B]=[h(a),h(b)];
+  return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');
+}
+function pintarMapa(){
+  const max = Math.max(...provincias.map(p=>p.v));
+  const mar = `
+    <text x="70" y="22" font-size="10" fill="#8FA6DA" font-style="italic" font-family="Figtree,sans-serif">Mar Caribe</text>
+    <text x="60" y="190" font-size="10" fill="#8FA6DA" font-style="italic" font-family="Figtree,sans-serif">Océano Pacífico</text>`;
+  const tiles = provincias.map(p=>{
+    const t = Math.log(p.v)/Math.log(max);
+    const fill = mezclar('#DCE6FA','#0A2F7A',t);
+    const txt = t>0.62 ? '#fff' : '#0B1B3F';
+    const sel = p.id===provSel;
+    return `<g class="provincia" data-p="${p.id}" tabindex="0" role="button" aria-label="${p.n}: ${p.v} voluntarios">
+      <rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="9" fill="${fill}" stroke="${sel?'#FFCB2B':'#fff'}" stroke-width="${sel?4:2}"/>
+      <text x="${p.x+p.w/2}" y="${p.y+p.h/2+3.5}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${txt}" font-family="Figtree,sans-serif">${p.c}</text></g>`;
+  }).join('');
+  $('#svg-mapa').innerHTML = mar + tiles;
+
+  const p = provPor(provSel), meta = Math.ceil(p.v*1.6/50)*50;
+  const pct = Math.round(p.v/meta*100);
+  $('#detalle-prov').innerHTML = `
+    <h3>${p.n}</h3>
+    <div class="fila"><div><strong>${fmt(p.v)}</strong><br><small>voluntarios, ${(p.v/total()*100).toFixed(1)} % del país</small></div>
+    <small>Meta: ${fmt(meta)}</small></div>
+    <div class="progreso"><i style="width:${pct}%"></i></div>`;
+
+  const orden=[...provincias].sort((a,b)=>b.v-a.v);
+  $('#ranking').innerHTML = orden.map(p=>`<div class="rank"><span>${p.n}</span><b>${fmt(p.v)}</b><div class="barra-r"><i style="width:${p.v/max*100}%"></i></div></div>`).join('');
+}
+$('#svg-mapa').addEventListener('click', e=>{ const g=e.target.closest('[data-p]'); if(g){ provSel=g.dataset.p; pintarMapa(); } });
+$('#svg-mapa').addEventListener('keydown', e=>{ const g=e.target.closest('[data-p]'); if(g && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); provSel=g.dataset.p; pintarMapa(); } });
+render.mapa = pintarMapa;
+
+/* ================= 6 y 7. Propuestas ================= */
+render.propuestas = ()=>{
+  $('#lista-prop').innerHTML = propuestas.map(p=>`
+    <button class="prop" data-prop="${p.id}"><span class="ico" style="background:${p.bg}">${p.e}</span>
+      <span><h3>${p.t}</h3><p>${p.r}</p><div class="apoyos">${fmt(p.a)} personas la apoyan</div></span></button>`).join('');
+};
+$('#lista-prop').addEventListener('click', e=>{ const b=e.target.closest('[data-prop]'); if(b){ propActual=b.dataset.prop; ir('propuesta'); } });
+render.propuesta = ()=>{
+  const p = propuestas.find(x=>x.id===propActual);
+  const ya = apoyadas.has(p.id);
+  const texto = encodeURIComponent(`${p.t}: ${p.r} Conoce más en Rumbo 29.`);
+  $('#prop-detalle').innerHTML = `
+    <div class="prop-hero"><span class="tema">${p.tema}</span><h1>${p.t}</h1><p>${p.r}</p></div>
+    <div class="seccion"><h2>Qué vamos a hacer</h2></div>
+    <div class="puntos">${p.p.map(x=>`<div class="punto">${x}</div>`).join('')}</div>
+    <div class="botones">
+      <button class="btn ${ya?'btn-borde':'btn-amarillo'}" id="apoyar">${ya?'Ya apoyas esta propuesta':'Apoyar esta propuesta'} (${fmt(p.a)})</button>
+      <a class="btn btn-azul" href="https://wa.me/?text=${texto}" target="_blank" rel="noopener" style="text-decoration:none">Compartir por WhatsApp</a>
+    </div>`;
+  $('#apoyar').onclick = ()=>{
+    if(apoyadas.has(p.id)){ apoyadas.delete(p.id); p.a--; }
+    else { apoyadas.add(p.id); p.a++; toast('Gracias, tu apoyo quedó registrado'); }
+    render.propuesta();
+  };
+};
+
+/* ================= 8. Testigo ================= */
+render.testigo = ()=>{
+  $('#pasos').innerHTML = pasos.map((x,i)=>`<button class="paso ${pasosHechos[i]?'hecho':''}" data-paso="${i}">
+    <span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></span><span>${x}</span></button>`).join('');
+  const e=$('#estado-acta');
+  const txt = {pendiente:'Acta pendiente', cola:'Acta guardada, se enviará al volver la señal', enviada:'Acta enviada y recibida'}[estadoActa];
+  e.classList.toggle('ok', estadoActa==='enviada'); e.querySelector('span').textContent = txt;
+};
+$('#pasos').addEventListener('click', e=>{ const b=e.target.closest('[data-paso]'); if(b){ const i=+b.dataset.paso; pasosHechos[i]=!pasosHechos[i]; render.testigo(); } });
+
+/* ================= 9. Acta ================= */
+const campos = [...candidaturas, 'Votos en blanco', 'Votos nulos'];
+$('#votos').innerHTML = campos.map((c,i)=>`<div class="voto"><label for="v${i}">${c}</label><input id="v${i}" class="vv" type="number" inputmode="numeric" min="0" placeholder="0"></div>`).join('')
+  + `<div class="voto total"><label for="vt">Personas que votaron (según el padrón)</label><input id="vt" type="number" inputmode="numeric" min="0" placeholder="0"></div>`;
+function revisarCuadre(){
+  const suma=[...document.querySelectorAll('.vv')].reduce((s,i)=>s+(+i.value||0),0);
+  const vt=+$('#vt').value||0, c=$('#cuadre');
+  if(!vt && !suma){ c.className='cuadre mal'; c.textContent='Anota los votos tal como aparecen en el acta.'; return false; }
+  if(suma===vt){ c.className='cuadre bien'; c.textContent=`El acta cuadra: ${fmt(suma)} votos contados.`; return true; }
+  c.className='cuadre mal'; c.textContent=`No cuadra: sumas ${fmt(suma)} votos y votaron ${fmt(vt)}. Revisa los números.`; return false;
+}
+$('#votos').addEventListener('input', revisarCuadre);
+$('#foto-input').addEventListener('change', e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ let img=$('#foto img'); if(!img){ img=document.createElement('img'); $('#foto').appendChild(img);} img.src=r.result; img.alt='Foto del acta'; };
+  r.readAsDataURL(f);
+});
+$('#enviar-acta').addEventListener('click', ()=>{
+  if(!$('#foto img')){ toast('Primero toma la foto del acta'); return; }
+  if(!revisarCuadre()){ toast('Los números no cuadran todavía'); return; }
+  estadoActa = navigator.onLine ? 'enviada' : 'cola';
+  toast(navigator.onLine ? 'Acta enviada' : 'Sin señal: el acta quedó guardada en tu teléfono');
+  ir('testigo');
+});
+render.acta = revisarCuadre;
+
+/* ================= Arranque ================= */
+mostrar('login');
+</script>
+</body>
+</html>
